@@ -1,5 +1,8 @@
 package sandrakorpi.molnintegrationbookapp.Models;
 
+/**
+ * Representerar en bok i systemet.
+ */
 public class Book {
     private int bookId;
     private String title;
@@ -8,8 +11,18 @@ public class Book {
     private String genre;
     private boolean isRecommended;  // Ja eller nej på om användaren rekommenderar boken
 
-    // Konstruktor
-    public Book(int bookId, String title, String author, int yearPublished, String genre, boolean isRecommended) {
+    /**
+     * Konstruktor för att skapa en ny bok.
+     *
+     * @param bookId ID för boken
+     * @param title Titel på boken
+     * @param author Författare till boken
+     * @param yearPublished År boken publicerades
+     * @param genre Genre av boken
+     * @param isRecommended Om boken är rekommenderad eller inte
+     */
+    public Book(final int bookId, final String title, final String author,
+                final int yearPublished, final String genre, final boolean isRecommended) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;
@@ -18,57 +31,111 @@ public class Book {
         this.isRecommended = isRecommended;
     }
 
-    // Getter och Setter för bookId
+    /**
+     * Hämtar bok-ID.
+     *
+     * @return bok-ID
+     */
     public int getBookId() {
         return bookId;
     }
 
-    public void setBookId(int bookId) {
+    /**
+     * Sätter bok-ID.
+     *
+     * @param bookId bok-ID att sätta
+     */
+    public void setBookId(final int bookId) {
         this.bookId = bookId;
     }
 
-    // Getter och Setter för title
+    /**
+     * Hämtar titel på boken.
+     *
+     * @return titel på boken
+     */
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    /**
+     * Sätter titel på boken.
+     *
+     * @param title titel att sätta
+     */
+    public void setTitle(final String title) {
         this.title = title;
     }
 
-    // Getter och Setter för author
+    /**
+     * Hämtar författare av boken.
+     *
+     * @return författare av boken
+     */
     public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
+    /**
+     * Sätter författare av boken.
+     *
+     * @param author författare att sätta
+     */
+    public void setAuthor(final String author) {
         this.author = author;
     }
 
-    // Getter och Setter för yearPublished
+    /**
+     * Hämtar året boken publicerades.
+     *
+     * @return år boken publicerades
+     */
     public int getYearPublished() {
         return yearPublished;
     }
 
-    public void setYearPublished(int yearPublished) {
+    /**
+     * Sätter året boken publicerades.
+     *
+     * @param yearPublished år att sätta
+     */
+    public void setYearPublished(final int yearPublished) {
         this.yearPublished = yearPublished;
     }
 
-    // Getter och Setter för genre
+    /**
+     * Hämtar genre av boken.
+     *
+     * @return genre av boken
+     */
     public String getGenre() {
         return genre;
     }
 
-    public void setGenre(String genre) {
+    /**
+     * Sätter genre av boken.
+     *
+     * @param genre genre att sätta
+     */
+    public void setGenre(final String genre) {
         this.genre = genre;
     }
 
-    // Getter och Setter för recommend
+    /**
+     * Kontrollerar om boken är rekommenderad.
+     *
+     * @return true om boken är rekommenderad, annars false
+     */
     public boolean isRecommended() {
         return isRecommended;
     }
 
-    public void setIsRecommended(boolean isRecommended) {
+    /**
+     * Sätter om boken är rekommenderad.
+     *
+     * @param isRecommended true om boken ska vara rekommenderad, annars false
+     */
+    public void setIsRecommended(final boolean isRecommended) {
         this.isRecommended = isRecommended;
     }
 }

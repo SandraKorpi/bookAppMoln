@@ -2,22 +2,27 @@ package sandrakorpi.molnintegrationbookapp.Models;
 
 import java.util.List;
 
+/**
+ * Representerar en användare i systemet.
+ */
 public class User {
     private int userId;
-   private String userName;
-   private String email;
+    private String userName;
+    private String email;
+    private String password; // Bör lagra haschat lösenord i databasen
+    private List<Book> bookList;
 
-  private  List<Book> bookList;
-
-    //Bör lagra haschat lösenord i databasen. Görs när användaren anger lösen
-    //Steg för lösenordshashning:
-    //Vid registrering/uppdatering: Du hashar användarens lösenord och sparar det hashade lösenordet i databasen.
-    //Vid inloggning: Du hashar det inmatade lösenordet och jämför det med det sparade hashade lösenordet.
-    //Bcrypt/spring security
-    String password;
-
-    // Konstruktor
-    public User(int userId, String userName, String email, String password, List<Book> bookList) {
+    /**
+     * Konstruktor för att skapa en ny användare.
+     *
+     * @param userId ID för användaren
+     * @param userName Användarnamn
+     * @param email E-postadress
+     * @param password Lösenord
+     * @param bookList Lista över böcker som användaren har
+     */
+    public User(final int userId, final String userName, final String email,
+                final String password, final List<Book> bookList) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
@@ -25,47 +30,93 @@ public class User {
         this.bookList = bookList;
     }
 
-    // Getter och Setter för userId
+    /**
+     * Hämtar användar-ID.
+     *
+     * @return användar-ID
+     */
     public int getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    /**
+     * Sätter användar-ID.
+     *
+     * @param userId användar-ID att sätta
+     */
+    public void setUserId(final int userId) {
         this.userId = userId;
     }
 
-    // Getter och Setter för userName
+    /**
+     * Hämtar användarnamn.
+     *
+     * @return användarnamn
+     */
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    /**
+     * Sätter användarnamn.
+     *
+     * @param userName användarnamn att sätta
+     */
+    public void setUserName(final String userName) {
         this.userName = userName;
     }
 
-    // Getter och Setter för email
+    /**
+     * Hämtar e-postadress.
+     *
+     * @return e-postadress
+     */
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    /**
+     * Sätter e-postadress.
+     *
+     * @param email e-postadress att sätta
+     */
+    public void setEmail(final String email) {
         this.email = email;
     }
 
-    // Getter och Setter för password
+    /**
+     * Hämtar lösenord.
+     *
+     * @return lösenord
+     */
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    /**
+     * Sätter lösenord.
+     *
+     * @param password lösenord att sätta
+     */
+    public void setPassword(final String password) {
         this.password = password;
     }
 
+    /**
+     * Hämtar lista över böcker som användaren har.
+     *
+     * @return lista över böcker
+     */
     public List<Book> getBookList() {
         return bookList;
     }
 
-    public void setBookList(List<Book> bookList) {
+    /**
+     * Sätter lista över böcker som användaren har.
+     *
+     * @param bookList lista över böcker att sätta
+     */
+    public void setBookList(final List<Book> bookList) {
         this.bookList = bookList;
     }
 }

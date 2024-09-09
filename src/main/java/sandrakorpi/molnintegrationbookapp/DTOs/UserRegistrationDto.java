@@ -1,43 +1,83 @@
 package sandrakorpi.molnintegrationbookapp.DTOs;
-//Klassen används vid registreringen.
+
+/**
+ * Dataöverföringsobjekt (DTO) för användarregistrering.
+ */
 public class UserRegistrationDto {
     private String userName;
     private String email;
     private String password; // Lösenordet kommer att hashas innan det sparas
 
+    /**
+     * Standardkonstruktor.
+     */
     public UserRegistrationDto() {
     }
 
-    public UserRegistrationDto(String userName, String email, String password) {
+    /**
+     * Konstruktor för att skapa ett nytt UserRegistrationDto-objekt.
+     *
+     * @param userName Användarnamn
+     * @param email E-postadress
+     * @param password Lösenord
+     */
+    public UserRegistrationDto(final String userName, final String email, final String password) {
         this.userName = userName;
         this.email = email;
         this.password = password;
     }
 
-    // Getter och Setter för userName
+    /**
+     * Hämtar användarnamn.
+     *
+     * @return användarnamn
+     */
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    /**
+     * Sätter användarnamn.
+     *
+     * @param userName användarnamn att sätta
+     */
+    public void setUserName(final String userName) {
         this.userName = userName;
     }
 
-    // Getter och Setter för email
+    /**
+     * Hämtar e-postadress.
+     *
+     * @return e-postadress
+     */
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    /**
+     * Sätter e-postadress.
+     *
+     * @param email e-postadress att sätta
+     */
+    public void setEmail(final String email) {
         this.email = email;
     }
 
-    // Getter och Setter för password
+    /**
+     * Hämtar lösenord.
+     *
+     * @return lösenord
+     */
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    /**
+     * Sätter lösenord.
+     *
+     * @param password lösenord att sätta
+     */
+    public void setPassword(final String password) {
         this.password = password;
     }
 }
