@@ -6,4 +6,7 @@ import sandrakorpi.molnintegrationbookapp.Models.Book;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book,Integer> {
+
 }
+
+
