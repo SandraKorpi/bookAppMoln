@@ -9,7 +9,9 @@ public class Book {
     private String author;
     private int yearPublished;
     private String genre;
-    private boolean isRecommended;  // Ja eller nej på om användaren rekommenderar boken
+
+    // Ja eller nej på om användaren rekommenderar boken
+    private boolean isRecommended;
 
     /**
      * Konstruktor för att skapa en ny bok.

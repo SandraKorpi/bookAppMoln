@@ -24,7 +24,7 @@ public class UserRegistrationDto {
     public UserRegistrationDto(
             final String userName,
             final String email,
-            final String password) 
+            final String password)
     {
         this.userName = userName;
         this.email = email;
