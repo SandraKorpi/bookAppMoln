@@ -21,8 +21,14 @@ public class Book {
      * @param genre Genre av boken
      * @param isRecommended Om boken är rekommenderad eller inte
      */
-    public Book(final int bookId, final String title, final String author,
-                final int yearPublished, final String genre, final boolean isRecommended) {
+    public Book(
+            final int bookId,
+            final String title,
+            final String author,
+            final int yearPublished,
+            final String genre,
+            final boolean isRecommended
+    ) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;

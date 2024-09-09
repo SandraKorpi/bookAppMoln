@@ -21,7 +21,11 @@ public class UserRegistrationDto {
      * @param email E-postadress
      * @param password Lösenord
      */
-    public UserRegistrationDto(final String userName, final String email, final String password) {
+    public UserRegistrationDto(
+            final String userName,
+            final String email,
+            final String password) 
+    {
         this.userName = userName;
         this.email = email;
         this.password = password;
