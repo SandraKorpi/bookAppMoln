@@ -5,7 +5,8 @@ package sandrakorpi.molnintegrationbookapp.DTOs;
  */
 public class UserDTO {
     private String email;
-    private String password;
+
+    private String userName;
 
     /**
      * Standardkonstruktor.
@@ -19,9 +20,9 @@ public class UserDTO {
      * @param email e-postadress för användarinloggning
      * @param password lösenord för användarinloggning
      */
-    public UserDTO(final String email, final String password) {
+    public UserDTO(final String email, final String userName) {
         this.email = email;
-        this.password = password;
+        this.userName = userName;
     }
 
     /**
@@ -42,21 +43,12 @@ public class UserDTO {
         this.email = email;
     }
 
-    /**
-     * Hämtar lösenord.
-     *
-     * @return lösenord
-     */
-    public String getPassword() {
-        return password;
+    public String getUserName(){
+        return userName;
     }
 
-    /**
-     * Sätter lösenord.
-     *
-     * @param password lösenord att sätta
-     */
-    public void setPassword(final String password) {
-        this.password = password;
+    public void setUserName(final String userName){
+        this.userName = userName;
     }
+
 }

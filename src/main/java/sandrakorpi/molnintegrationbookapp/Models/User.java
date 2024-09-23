@@ -1,51 +1,85 @@
 package sandrakorpi.molnintegrationbookapp.Models;
 
+import jakarta.persistence.*;
+
 import java.util.List;
+import java.util.Set;
 
 /**
  * Representerar en användare i systemet.
  */
+
+@Entity
+@Table(name = "users")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
     private String userName;
     private String email;
     private String password; // Bör lagra haschat lösenord i databasen
-    private List<Book> bookList;
+
+    /**
+     * Listan över böcker som användaren har som favoriter.
+     *
+     * @ManyToMany: Anger att varje användare kan ha flera favoritböcker och varje bok kan vara favorit för flera användare.
+     * @JoinTable: Definierar den join-tabell som kommer att användas för att lagra denna relation.
+     * - name: Namnet på join-tabellen (user_favorite_books).
+     * - joinColumns: Kolumnen i join-tabellen som refererar till den aktuella entiteten (user_id).
+     * - inverseJoinColumns: Kolumnen i join-tabellen som refererar till den relaterade entiteten (book_id).
+     */
+    @ManyToMany
+    @JoinTable(
+            name = "user_favorite_books",  // Namn på join-tabellen som kopplar användare och favoritböcker
+            joinColumns = @JoinColumn(name = "user_id"),  // Kolumn som refererar till användaren i join-tabellen
+            inverseJoinColumns = @JoinColumn(name = "book_id")  // Kolumn som refererar till boken i join-tabellen
+    )
+    private Set<Book> favoriteBooks;
+
+    /**
+     * Listan över böcker som användaren vill läsa i framtiden.
+     *
+     * @ManyToMany: Anger att varje användare kan ha flera böcker som de vill läsa och varje bok kan vara på flera användares att-läsa-lista.
+     * @JoinTable: Definierar den join-tabell som kommer att användas för att lagra denna relation.
+     * - name: Namnet på join-tabellen (user_books_to_read).
+     * - joinColumns: Kolumnen i join-tabellen som refererar till den aktuella entiteten (user_id).
+     * - inverseJoinColumns: Kolumnen i join-tabellen som refererar till den relaterade entiteten (book_id).
+     */
+    @ManyToMany
+    @JoinTable(
+            name = "user_books_to_read",  // Namn på join-tabellen som kopplar användare och böcker de vill läsa
+            joinColumns = @JoinColumn(name = "user_id"),  // Kolumn som refererar till användaren i join-tabellen
+            inverseJoinColumns = @JoinColumn(name = "book_id")  // Kolumn som refererar till boken i join-tabellen
+    )
+    private Set<Book> booksToRead;
 
     /**
      * Konstruktor för att skapa en ny användare.
      *
-     * @param userId ID för användaren
      * @param userName Användarnamn
      * @param email E-postadress
      * @param password Lösenord
-     * @param bookList Lista över böcker som användaren har
+     * @param favoriteBooks Lista över böcker som användaren tycker om
+     * @param booksToRead Lista över böcker som användaren vill läsa.
      */
-    public User(final int userId, final String userName, final String email,
-                final String password, final List<Book> bookList) {
-        this.userId = userId;
+    public User(
+            final String userName,
+            final String email,
+            final String password,
+            final Set<Book> favoriteBooks,
+            final Set<Book> booksToRead
+    ) {
         this.userName = userName;
         this.email = email;
         this.password = password;
-        this.bookList = bookList;
+        this.favoriteBooks = favoriteBooks;
+        this.booksToRead = booksToRead;
     }
 
-    /**
-     * Hämtar användar-ID.
-     *
-     * @return användar-ID
-     */
-    public int getUserId() {
-        return userId;
-    }
+    // Standardkonstruktör
 
-    /**
-     * Sätter användar-ID.
-     *
-     * @param userId användar-ID att sätta
-     */
-    public void setUserId(final int userId) {
-        this.userId = userId;
+    public User() {
+
     }
 
     /**
@@ -55,6 +89,15 @@ public class User {
      */
     public String getUserName() {
         return userName;
+    }
+
+    /**
+     * Hämtar användarid..
+     *
+     * @return användarId.
+     */
+    public int getUserId(){
+        return userId;
     }
 
     /**
@@ -103,20 +146,39 @@ public class User {
     }
 
     /**
-     * Hämtar lista över böcker som användaren har.
+     * Hämtar lista över böcker som användaren har läst.
      *
      * @return lista över böcker
      */
-    public List<Book> getBookList() {
-        return bookList;
+    public Set<Book> getFavoriteBooks() {
+        return favoriteBooks;
+    }
+    /**
+     * Sätter listan över favoritböcker för användaren.
+     *
+     * @param favoriteBooks Set av böcker som användaren har som favorit
+     */
+    public void setFavoriteBooks(Set<Book> favoriteBooks) {
+        this.favoriteBooks = favoriteBooks;
     }
 
     /**
-     * Sätter lista över böcker som användaren har.
+     * Hämtar listan över böcker som användaren vill läsa i framtiden.
      *
-     * @param bookList lista över böcker att sätta
+     * @return Set av böcker som användaren vill läsa
      */
-    public void setBookList(final List<Book> bookList) {
-        this.bookList = bookList;
+    public Set<Book> getBooksToRead() {
+        return booksToRead;
     }
+
+
+    /**
+     * Sätter lista över böcker som användaren vill läsa i framtiden.
+     *
+     * @param booksToRead lista över böcker att sätta
+     */
+    public void setBooksToRead(final Set<Book> booksToRead) {
+        this.booksToRead = booksToRead;
+    }
+
 }

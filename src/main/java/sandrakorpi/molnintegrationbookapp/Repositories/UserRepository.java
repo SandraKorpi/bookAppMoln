@@ -5,6 +5,7 @@ import sandrakorpi.molnintegrationbookapp.Models.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
+    // Metod för att hitta användare baserat på e-post
     User findByEmail(String email);
 
 }
