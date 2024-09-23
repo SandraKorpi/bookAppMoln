@@ -1,89 +1,55 @@
 package sandrakorpi.molnintegrationbookapp.Services;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sandrakorpi.molnintegrationbookapp.DTOs.UserDTO;
 import sandrakorpi.molnintegrationbookapp.DTOs.UserRegistrationDto;
-import sandrakorpi.molnintegrationbookapp.Models.Book;
 import sandrakorpi.molnintegrationbookapp.Models.User;
 import sandrakorpi.molnintegrationbookapp.Repositories.BookRepository;
 import sandrakorpi.molnintegrationbookapp.Repositories.UserRepository;
 import sandrakorpi.molnintegrationbookapp.exceptions.ResourceNotFoundException;
+import sandrakorpi.molnintegrationbookapp.exceptions.UserAlreadyExistsException;
 
 import java.util.List;
 
 @Service
 public class UserService {
 
-    public final UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public final BookRepository bookRepository;
-
-    /**
-     * Konstruktor för att skapa en UserService.
-     *
-     * @param userRepository Repository för att hantera användardata
-     */
-    public UserService(UserRepository userRepository, BookRepository bookRepository) {
+    public UserService(UserRepository userRepository, BookRepository bookRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Hämtar en användare baserat på deras ID.
-     *
-     * @param id Användarens ID
-     * @return Användaren med det angivna ID
-     */
     public User getUserById(int id) {
         return getUserOrFail(id);
     }
 
-    /**
-     * Hämtar alla användare.
-     *
-     * @return Lista över alla användare
-     */
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
-    /**
-     * Uppdaterar en användare baserat på deras ID.
-     *
-     * @param id                 Användarens ID
-     * @param userRegistrationDto DTO med användarens uppdaterade information
-     * @return Den uppdaterade användaren
-     */
     public User updateUser(int id, UserRegistrationDto userRegistrationDto) {
         User existingUser = getUserOrFail(id);
         existingUser.setUserName(userRegistrationDto.getUserName());
         existingUser.setEmail(userRegistrationDto.getEmail());
-        existingUser.setPassword(userRegistrationDto.getPassword());
+        existingUser.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword())); // Kryptera lösenordet
         return userRepository.save(existingUser);
     }
 
-    /**
-     * Tar bort en användare baserat på deras ID.
-     *
-     * @param id Användarens ID
-     */
     public void deleteUser(int id) {
         User userToDelete = getUserOrFail(id);
         userRepository.delete(userToDelete);
     }
 
-    /**
-     * Hämtar en användare baserat på deras ID eller kastar ett undantag om användaren inte hittas.
-     *
-     * @param id Användarens ID
-     * @return Användaren med det angivna ID
-     * @throws ResourceNotFoundException Om användaren inte finns
-     */
     public User getUserOrFail(int id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("There is no User with id " + id));
     }
-
 
     public UserDTO findUserByEmail(String email) {
         User user = userRepository.findByEmail(email);
@@ -95,4 +61,26 @@ public class UserService {
 
     private UserDTO convertToDTO(User user) {
         return new UserDTO(user.getUserName(), user.getEmail());
-    }}
+    }
+
+    /**
+     * Registrerar en ny användare.
+     *
+     * @param userRegistrationDto DTO med användarens registreringsinformation
+     * @return Den registrerade användaren
+     */
+    public User register(UserRegistrationDto userRegistrationDto) {
+        // Kontrollera om e-post redan finns
+        if (userRepository.existsByEmail(userRegistrationDto.getEmail())) {
+            throw new UserAlreadyExistsException("Email already in use");
+        }
+
+        // Skapa en ny användare
+        User user = new User();
+        user.setUserName(userRegistrationDto.getUserName());
+        user.setEmail(userRegistrationDto.getEmail());
+        user.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword())); // Kryptera lösenordet
+
+        return userRepository.save(user); // Spara användaren i databasen
+    }
+}
