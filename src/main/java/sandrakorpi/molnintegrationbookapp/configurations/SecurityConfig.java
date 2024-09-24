@@ -45,7 +45,7 @@ public class SecurityConfig {
                                     "/swagger-ui/**",
                                     "/swagger-ui/index.html"
                             ).permitAll() // Dessa vägar kräver ingen autentisering
-                            .requestMatchers("/books/**").authenticated() // Endast autentiserade användare kan hantera böcker
+                            .requestMatchers("/books/**").permitAll() // Endast autentiserade användare kan hantera böcker
                             .anyRequest().authenticated(); // Alla andra vägar kräver autentisering
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

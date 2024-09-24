@@ -10,11 +10,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
 
@@ -35,7 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // Kontrollera om begäran är för specifika vägar som ska tillåtas utan autentisering
-        if (path.startsWith("/auth/login") || path.startsWith("/auth/signup") || path.startsWith("/auth/register")) {
+        if (path.startsWith("/auth/login") ||
+                path.startsWith("/auth/signup") ||
+                path.startsWith("/auth/register")) {
             chain.doFilter(request, response); // Fortsätt utan autentisering
             return;
         }
@@ -51,13 +57,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 // Logga inloggningen
-                System.out.println("Authenticated user: " + username);
+                logger.debug("Authenticated user: " + username);
             } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
                 return;
             }
         } else {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing or malformed");
+            return;
+        }
+
+        // Kontrollera om användaren är autentiserad och om begäran är för skyddade vägar
+        if (!path.startsWith("/auth/") && SecurityContextHolder.getContext().getAuthentication() == null) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
             return;
         }
 
