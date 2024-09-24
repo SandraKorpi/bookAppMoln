@@ -1,9 +1,10 @@
 package sandrakorpi.molnintegrationbookapp.Services;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.Authentication;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sandrakorpi.molnintegrationbookapp.DTOs.LoginUserDto;
@@ -31,40 +32,13 @@ public class AuthenticationService {
         this.userService = userService;
     }
 
-    public User authenticate(LoginUserDto input) {
-        try {
-            // Kontrollera autentiseringen
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            input.getEmail(),
-                            input.getPassword()
-                    )
-            );
+    public Authentication authenticate(LoginUserDto loginUserDto) {
+        // Skapa en authentication token från inloggningsuppgifterna
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginUserDto.getUserName(), loginUserDto.getPassword());
 
-            // Hämta användaren efter autentisering
-            User user = userRepository.findByEmail(input.getEmail());
-            if (user == null) {
-                throw new UsernameNotFoundException("User not found");
-            }
-            return user;
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid username or password");
-        }
+        // Autentisera användaren med AuthenticationManager
+        return authenticationManager.authenticate(authenticationToken);
     }
 
-    // Exempel på registreringsmetod
-    public User register(UserRegistrationDto input) {
-        // Kontrollera om e-post redan finns
-        if (userRepository.existsByEmail(input.getEmail())) {
-            throw new UserAlreadyExistsException("Email already in use");
-        }
-
-        // Skapa ny användare
-        User newUser = new User();
-        newUser.setEmail(input.getEmail());
-        newUser.setPassword(passwordEncoder.encode(input.getPassword()));
-        // Sätt andra fält om det behövs
-
-        return userRepository.save(newUser);
-    }
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import sandrakorpi.molnintegrationbookapp.Models.User;
 import sandrakorpi.molnintegrationbookapp.Repositories.UserRepository;
 
+import java.util.ArrayList;
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -18,15 +20,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUserName(username);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UsernameNotFoundException("User not found");
         }
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .authorities("USER") // Ändra detta baserat på dina roller
-                .build();
+        return user; // Returnera user
     }
+
 }

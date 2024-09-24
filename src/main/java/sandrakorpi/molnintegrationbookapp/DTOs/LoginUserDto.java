@@ -4,23 +4,23 @@ package sandrakorpi.molnintegrationbookapp.DTOs;
  * Dataöverföringsobjekt (DTO) för användarinloggning.
  */
 public class LoginUserDto {
-    private String email;
+    private String userName;
     private String password;
 
     public LoginUserDto() {
     }
 
-    public LoginUserDto(String email, String password) {
-        this.email = email;
+    public LoginUserDto(String userName, String password) {
+        this.userName = userName;
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getPassword() {
@@ -30,4 +30,5 @@ public class LoginUserDto {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

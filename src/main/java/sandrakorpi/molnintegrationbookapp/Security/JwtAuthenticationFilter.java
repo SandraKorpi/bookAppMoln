@@ -6,7 +6,9 @@ import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,9 +16,11 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends HttpFilter {
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -28,16 +32,13 @@ public class JwtAuthenticationFilter extends HttpFilter {
             String token = authHeader.substring(7);
             if (jwtTokenProvider.validateToken(token)) {
                 String username = jwtTokenProvider.getUsernameFromToken(token);
-                // Här kan du ladda användarens detaljer och ställa in säkerhetskontexten
-                // till exempel:
-                // UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                // UsernamePasswordAuthenticationToken authentication =
-                //     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                // authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // SecurityContextHolder.getContext().setAuthentication(authentication);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 
-        chain.doFilter(request, response); // Fortsätt till nästa filter
+        chain.doFilter(request, response);
     }
 }
