@@ -14,19 +14,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import sandrakorpi.molnintegrationbookapp.Security.JwtAuthenticationFilter;
-import sandrakorpi.molnintegrationbookapp.Security.JwtTokenProvider;
 import sandrakorpi.molnintegrationbookapp.Services.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider, CustomUserDetailsService userDetailsService) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
@@ -36,15 +32,24 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/signup", "/auth/register", "/auth/login", "/swagger-resources/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                            .anyRequest().authenticated();
+                    // Tillåtna matcherare för Swagger-resurser och autentisering
+                    auth.requestMatchers(
+                                    "/auth/signup",
+                                    "/auth/register",
+                                    "/auth/login",
+                                    "/swagger-resources/**",
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui/**",
+                                    "/swagger-ui/index.html"
+                            ).permitAll() // Dessa vägar kräver ingen autentisering
+                            .requestMatchers("/books/**").authenticated() // Endast autentiserade användare kan hantera böcker
+                            .anyRequest().authenticated(); // Alla andra vägar kräver autentisering
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(customAuthenticationProvider())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService), UsernamePasswordAuthenticationFilter.class); // Lägger till userDetailsService här
+                .authenticationProvider(customAuthenticationProvider());
 
         return http.build();
     }
