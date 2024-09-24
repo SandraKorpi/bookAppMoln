@@ -28,6 +28,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String path = request.getRequestURI(); // Hämta begärans väg
 
+        // Tillåt Swagger-resurser utan autentisering
+        if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui") || path.startsWith("/swagger-ui.html")) {
+            chain.doFilter(request, response); // Fortsätt utan autentisering
+            return;
+        }
+
         // Kontrollera om begäran är för specifika vägar som ska tillåtas utan autentisering
         if (path.startsWith("/auth/login") || path.startsWith("/auth/signup") || path.startsWith("/auth/register")) {
             chain.doFilter(request, response); // Fortsätt utan autentisering
@@ -44,6 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Logga inloggningen
+                System.out.println("Authenticated user: " + username);
             } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
                 return;
