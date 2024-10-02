@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sandrakorpi.molnintegrationbookapp.DTOs.UserDTO;
+import sandrakorpi.molnintegrationbookapp.Models.Book;
 import sandrakorpi.molnintegrationbookapp.Models.User;
 import sandrakorpi.molnintegrationbookapp.Services.UserService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -35,5 +37,17 @@ public class UserController {
     public ResponseEntity<UserDTO> findUserByEmail(@PathVariable String email) {
         UserDTO foundUser = userService.findUserByEmail(email);
         return ResponseEntity.ok().body(foundUser);
+    }
+    @Operation(summary = "Hämta användarens favoritböcker")
+    @GetMapping("/{id}/favorite-books")
+    public ResponseEntity<Set<Book>> getBookList (@PathVariable int id)
+    {
+Set<Book> bookList = userService.getFavoriteBooks(id);
+if (bookList.isEmpty())
+{
+    System.out.println("Du har inte lagt till några favoritböcker ännu. ");
+    return ResponseEntity.noContent().build();
+}
+      return ResponseEntity.ok().body(bookList);
     }
 }

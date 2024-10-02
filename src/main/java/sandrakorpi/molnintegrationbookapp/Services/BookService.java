@@ -59,7 +59,7 @@ public class BookService {
     /**
      * Uppdaterar en befintlig bok baserat på dess ID.
      *
-     * @param id ID för boken som ska uppdateras
+     * @param id      ID för boken som ska uppdateras
      * @param bookDto DTO med ny bokinformation
      * @return den uppdaterade {@link Book}
      */
@@ -106,7 +106,7 @@ public class BookService {
     }
 
     // Metod för att skapa eller hämta en bok baserat på dess ID och lägga till den i en användares lista
-    public Book addOrUpdateBookForUser(int userId, BookDto bookDto, boolean isFavorite) {
+   /* public Book addOrUpdateBookForUser(int userId, BookDto bookDto, boolean isFavorite) {
         // Försök att hämta boken från databasen
         Book book = bookRepository.findById(bookDto.getBookId())
                 .orElseGet(() -> {
@@ -129,4 +129,5 @@ public class BookService {
         userRepository.save(user); // Spara användaren med den uppdaterade listan
         return book;
     }
+*/
 }

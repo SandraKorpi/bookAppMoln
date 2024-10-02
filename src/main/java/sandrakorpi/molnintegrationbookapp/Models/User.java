@@ -32,16 +32,6 @@ public class User implements UserDetails {
     )
     private Set<Book> favoriteBooks;
 
-    /**
-     * Listan över böcker som användaren vill läsa i framtiden.
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "user_books_to_read",  // Namn på join-tabellen
-            joinColumns = @JoinColumn(name = "user_id"),  // Referens till användaren
-            inverseJoinColumns = @JoinColumn(name = "book_id")  // Referens till boken
-    )
-    private Set<Book> booksToRead;
 
     // Standardkonstruktör
     public User() {}
@@ -60,7 +50,6 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.favoriteBooks = favoriteBooks;
-        this.booksToRead = booksToRead;
     }
 
     // UserDetails metoder
@@ -129,13 +118,7 @@ public class User implements UserDetails {
         this.favoriteBooks = favoriteBooks;
     }
 
-    public Set<Book> getBooksToRead() {
-        return booksToRead;
-    }
 
-    public void setBooksToRead(final Set<Book> booksToRead) {
-        this.booksToRead = booksToRead;
-    }
 
     public void setPassword(final String password) {
         this.password = password;

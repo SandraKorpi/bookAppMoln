@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sandrakorpi.molnintegrationbookapp.DTOs.UserDTO;
 import sandrakorpi.molnintegrationbookapp.DTOs.UserRegistrationDto;
+import sandrakorpi.molnintegrationbookapp.Models.Book;
 import sandrakorpi.molnintegrationbookapp.Models.User;
 import sandrakorpi.molnintegrationbookapp.Repositories.BookRepository;
 import sandrakorpi.molnintegrationbookapp.Repositories.UserRepository;
@@ -11,6 +12,8 @@ import sandrakorpi.molnintegrationbookapp.exceptions.ResourceNotFoundException;
 import sandrakorpi.molnintegrationbookapp.exceptions.UserAlreadyExistsException;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -82,5 +85,11 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword())); // Kryptera lösenordet
 
         return userRepository.save(user); // Spara användaren i databasen
+    }
+
+    public Set<Book> getFavoriteBooks (int id)
+    {
+      User findUser = getUserOrFail(id);
+        return findUser.getFavoriteBooks();
     }
 }

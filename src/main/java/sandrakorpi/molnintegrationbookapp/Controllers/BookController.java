@@ -31,19 +31,20 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(addedBook);
     }
 
-    @Operation(summary = "Lägg till en bok till en lista")
+   /* @Operation(summary = "Lägg till en bok till en lista")
     @PostMapping("/addToList")
     public ResponseEntity<Book> addBookToList(@Valid @RequestBody BookDto bookDto, @RequestParam int userId, @RequestParam boolean isFavorite) {
         Book addedOrUpdatedBook = bookService.addOrUpdateBookForUser(userId, bookDto, isFavorite);
         return ResponseEntity.status(HttpStatus.OK).body(addedOrUpdatedBook);
     }
-
+*/
     @Operation(summary = "Hämta alla böcker")
     @GetMapping
     public ResponseEntity<List<Book>> getAllBooks() {
         List<Book> bookList = bookService.getAllBooks();
         return ResponseEntity.ok(bookList);
     }
+
 
     @Operation(summary = "Hämta bok med specifikt ID")
     @GetMapping("/{id}")
