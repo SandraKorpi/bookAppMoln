@@ -1,5 +1,8 @@
 package sandrakorpi.molnintegrationbookapp.Services;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sandrakorpi.molnintegrationbookapp.DTOs.UserDTO;
@@ -92,4 +95,24 @@ public class UserService {
       User findUser = getUserOrFail(id);
         return findUser.getFavoriteBooks();
     }
-}
+
+    public int getLoggedInUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetails) {
+                UserDetails userDetails = (UserDetails) principal;
+                String username = userDetails.getUsername();
+
+                // Hämta användaren baserat på användarnamnet
+                User user = userRepository.findByUserName(username);
+                if (user == null) {
+                    throw new ResourceNotFoundException("Användare hittades inte");
+                }
+                return user.getUserId();
+            }
+        }
+        throw new SecurityException("Ingen inloggad användare");
+    }}

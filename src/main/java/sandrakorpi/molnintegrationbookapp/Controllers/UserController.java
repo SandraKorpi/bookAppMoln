@@ -39,10 +39,10 @@ public class UserController {
         return ResponseEntity.ok().body(foundUser);
     }
     @Operation(summary = "Hämta användarens favoritböcker")
-    @GetMapping("/{id}/favorite-books")
-    public ResponseEntity<Set<Book>> getBookList (@PathVariable int id)
+    @GetMapping("/favorite-books")
+    public ResponseEntity<Set<Book>> getBookList ()
     {
-Set<Book> bookList = userService.getFavoriteBooks(id);
+Set<Book> bookList = userService.getFavoriteBooks(userService.getLoggedInUserId());
 if (bookList.isEmpty())
 {
     System.out.println("Du har inte lagt till några favoritböcker ännu. ");
