@@ -42,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (path.startsWith("/auth/login") ||
                 path.startsWith("/auth/signup") ||
                 path.startsWith("/auth/register")) {
+
             chain.doFilter(request, response); // Fortsätt utan autentisering
             return;
         }

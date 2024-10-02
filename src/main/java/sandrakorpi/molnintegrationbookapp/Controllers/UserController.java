@@ -38,6 +38,7 @@ public class UserController {
         UserDTO foundUser = userService.findUserByEmail(email);
         return ResponseEntity.ok().body(foundUser);
     }
+
     @Operation(summary = "Hämta användarens favoritböcker")
     @GetMapping("/favorite-books")
     public ResponseEntity<Set<Book>> getBookList ()
