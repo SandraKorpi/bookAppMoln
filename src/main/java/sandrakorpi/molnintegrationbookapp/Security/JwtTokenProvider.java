@@ -15,7 +15,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}") // Läs hemligheten från application.properties
+    @Value("${security.jwt.secret-key}") // Läs hemligheten från application.properties
     private String jwtSecret;
     private final int jwtExpirationMs;
 
