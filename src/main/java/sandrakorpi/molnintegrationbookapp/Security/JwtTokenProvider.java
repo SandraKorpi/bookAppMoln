@@ -15,21 +15,22 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
+    @Value("${jwt.secret}") // Läs hemligheten från application.properties
     private String jwtSecret;
     private final int jwtExpirationMs;
 
     public JwtTokenProvider(@Value("${jwt.expirationMs}") int jwtExpirationMs) {
         this.jwtExpirationMs = jwtExpirationMs;
-        this.jwtSecret = generateJwtSecret(); // Generera hemligheten vid instansiering
+      //  this.jwtSecret = generateJwtSecret(); // Generera hemligheten vid instansiering
     }
 
     // Generera en säker JWT-hemlighet
-    private String generateJwtSecret() {
+   /* private String generateJwtSecret() {
         byte[] secretBytes = new byte[64];
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(secretBytes);
         return Base64.getEncoder().encodeToString(secretBytes);
-    }
+    } */
 
     // Generera JWT-token
     public String generateToken(Authentication authentication) {
