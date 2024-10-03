@@ -1,79 +1,105 @@
 package sandrakorpi.molnintegrationbookapp.Security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import sandrakorpi.molnintegrationbookapp.Services.JwtService;
 
 import java.io.IOException;
 
+// @Component-annotering för att markera denna klass som en Spring-komponent.
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
-    private final JwtTokenProvider jwtTokenProvider;
+    // Privat fält för att hålla en instans av HandlerExceptionResolver.
+    private final HandlerExceptionResolver handlerExceptionResolver;
+    // Privat fält för att hålla en instans av JwtService.
+    private final JwtService jwtService;
+    // Privat fält för att hålla en instans av UserDetailsService.
     private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    // Konstruktor för att injicera beroendena JwtService, UserDetailsService och HandlerExceptionResolver.
+    @Autowired
+    public JwtAuthenticationFilter(
+            JwtService jwtService,
+            UserDetailsService userDetailsService,
+            HandlerExceptionResolver handlerExceptionResolver
+    ) {
+        // Tilldelar den injicerade JwtService till det privata fältet.
+        this.jwtService = jwtService;
+        // Tilldelar den injicerade UserDetailsService till det privata fältet.
         this.userDetailsService = userDetailsService;
+        // Tilldelar den injicerade HandlerExceptionResolver till det privata fältet.
+        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
+    // Override för att implementera doFilterInternal-metoden.
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
-        String path = request.getRequestURI(); // Hämta begärans väg
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request, // Användarens HTTP-begäran.
+            @NonNull HttpServletResponse response, // HTTP-svaret som ska skickas tillbaka.
+            @NonNull FilterChain filterChain // Kedjan av filter som begäran passerar igenom.
+    ) throws ServletException, IOException {
+        // Hämtar Authorization-headern från begäran.
+        final String authHeader = request.getHeader("Authorization");
 
-        // Tillåt Swagger-resurser utan autentisering
-        if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui") || path.startsWith("/swagger-ui.html")) {
-            chain.doFilter(request, response); // Fortsätt utan autentisering
-            return;
+        // Om Authorization-headern är null eller inte börjar med "Bearer " (standardprefix för JWT).
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            // Fortsätter med nästa filter i kedjan utan att göra något.
+            filterChain.doFilter(request, response);
+            return; // Avslutar metoden här om det inte finns en giltig JWT-token.
         }
 
-        // Kontrollera om begäran är för specifika vägar som ska tillåtas utan autentisering
-        if (path.startsWith("/auth/login") ||
-                path.startsWith("/auth/signup") ||
-                path.startsWith("/auth/register")) {
+        try {
+            // Extraherar JWT-token från Authorization-headern.
+            final String jwt = authHeader.substring(7);
+            // Använder JwtService för att extrahera användarnamnet från JWT-token.
+            final String userEmail = jwtService.extractUsername(jwt);
 
-            chain.doFilter(request, response); // Fortsätt utan autentisering
-            return;
-        }
+            // Hämtar aktuell autentiseringsinformation från säkerhetskontexten.
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String authHeader = request.getHeader("Authorization");
+            // Om användarnamnet finns och det inte redan finns en autentisering.
+            if (userEmail != null && authentication == null) {
+                // Laddar användardetaljer från UserDetailsService med hjälp av användarnamnet.
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            if (jwtTokenProvider.validateToken(token)) {
-                String username = jwtTokenProvider.getUsernameFromToken(token);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                // Logga inloggningen
-                logger.debug("Authenticated user: " + username);
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
-                return;
+                // Om JWT-token är giltig för de laddade användardetaljerna.
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    // Skapar en UsernamePasswordAuthenticationToken för den autentiserade användaren.
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, // Användarens detaljer.
+                            null, // Inga autentiseringsuppgifter (lösenord) behövs här.
+                            userDetails.getAuthorities() // Användarens roller och rättigheter.
+                    );
+
+                    // Sätter autentiseringsdetaljer från begäran.
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // Sätter autentiseringen i säkerhetskontexten.
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing or malformed");
-            return;
-        }
 
-        // Kontrollera om användaren är autentiserad och om begäran är för skyddade vägar
-        if (!path.startsWith("/auth/") && SecurityContextHolder.getContext().getAuthentication() == null) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-            return;
+            // Fortsätter med nästa filter i kedjan.
+            filterChain.doFilter(request, response);
+        } catch (Exception exception) {
+            // Hanterar undantag genom att skicka dem till HandlerExceptionResolver.
+            handlerExceptionResolver.resolveException(request, response, null, exception);
         }
-
-        chain.doFilter(request, response);
     }
 }

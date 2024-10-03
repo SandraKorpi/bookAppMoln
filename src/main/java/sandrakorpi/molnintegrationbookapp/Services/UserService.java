@@ -90,9 +90,8 @@ public class UserService {
         return userRepository.save(user); // Spara användaren i databasen
     }
 
-    public Set<Book> getFavoriteBooks (int id)
-    {
-      User findUser = getUserOrFail(id);
+    public Set<Book> getFavoriteBooks(int id) {
+        User findUser = getUserOrFail(id);
         return findUser.getFavoriteBooks();
     }
 
@@ -107,12 +106,12 @@ public class UserService {
                 String username = userDetails.getUsername();
 
                 // Hämta användaren baserat på användarnamnet
-                User user = userRepository.findByUserName(username);
-                if (user == null) {
-                    throw new ResourceNotFoundException("Användare hittades inte");
-                }
+                User user = userRepository.findByUserName(username)
+                        .orElseThrow(() -> new ResourceNotFoundException("Användare hittades inte"));
+
                 return user.getUserId();
             }
         }
         throw new SecurityException("Ingen inloggad användare");
-    }}
+    }
+}

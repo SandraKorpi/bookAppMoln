@@ -1,8 +1,8 @@
 package sandrakorpi.molnintegrationbookapp.Controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,9 +11,10 @@ import sandrakorpi.molnintegrationbookapp.DTOs.JwtResponse;
 import sandrakorpi.molnintegrationbookapp.DTOs.LoginUserDto;
 import sandrakorpi.molnintegrationbookapp.DTOs.UserRegistrationDto;
 import sandrakorpi.molnintegrationbookapp.Models.User;
-import sandrakorpi.molnintegrationbookapp.Security.JwtTokenProvider;
 import sandrakorpi.molnintegrationbookapp.Services.AuthenticationService;
+import sandrakorpi.molnintegrationbookapp.Services.JwtService;
 import sandrakorpi.molnintegrationbookapp.Services.UserService;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -21,24 +22,32 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
     private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider; // Lägg till JwtTokenProvider som dependency
 
-    public AuthController(AuthenticationService authenticationService, UserService userService, JwtTokenProvider jwtTokenProvider) {
+    private final JwtService jwtService;
+
+
+    public AuthController(AuthenticationService authenticationService, UserService userService, JwtService jwtService) {
         this.authenticationService = authenticationService;
         this.userService = userService;
-        this.jwtTokenProvider = jwtTokenProvider; // Inject JwtTokenProvider
+        this.jwtService = jwtService;
+
     }
 
+    // @PostMapping-annoteringen definierar en metod som hanterar POST-begäran till "/login".
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginUserDto loginUserDto) {
-        Authentication authentication = authenticationService.authenticate(loginUserDto);  // Returnerar Authentication-objekt
+    @Operation(summary = "log in", description = "Log in a user")
+    public ResponseEntity<JwtResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
+        // Kallar authenticate-metoden i AuthenticationService med loginUserDto och sparar den autentiserade användaren.
+        User authenticatedUser = authenticationService.authenticate(loginUserDto);
 
-        // Generera JWT token med injected JwtTokenProvider
-        String token = jwtTokenProvider.generateToken(authentication);
+        // Genererar en JWT-token för den autentiserade användaren.
+        String jwtToken = jwtService.generateToken(authenticatedUser);
 
-        // Returnera token och användarinformation
-        User user = (User) authentication.getPrincipal(); // Hämtar användardetaljer
-        return ResponseEntity.ok(new JwtResponse(token, user));
+        // Skapar en ny instans av LoginResponse med JWT-token och utgångstiden.
+        JwtResponse loginResponse = new JwtResponse(jwtToken, authenticatedUser ,jwtService.getExpirationTime());
+
+        // Returnerar en ResponseEntity med status 200 (OK) och loginResponse i kroppen.
+        return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/register")

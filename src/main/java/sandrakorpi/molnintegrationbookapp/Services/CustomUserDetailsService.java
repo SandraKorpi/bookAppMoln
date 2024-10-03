@@ -9,7 +9,6 @@ import sandrakorpi.molnintegrationbookapp.Models.User;
 import sandrakorpi.molnintegrationbookapp.Repositories.UserRepository;
 
 import java.util.ArrayList;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -21,11 +20,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return user; // Returnera user
+        // Hämta användaren från databasen baserat på användarnamnet
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Användaren " + username + " hittades inte"));
+
+        // Skapa och returnera ett UserDetails-objekt baserat på användaren
+        return new org.springframework.security.core.userdetails.User(
+                user.getUserName(),
+                user.getPassword(),
+                new ArrayList<>()
+        );
     }
 
 }
