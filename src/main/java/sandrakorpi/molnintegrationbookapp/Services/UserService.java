@@ -69,12 +69,6 @@ public class UserService {
         return new UserDTO(user.getUserName(), user.getEmail());
     }
 
-    /**
-     * Registrerar en ny användare.
-     *
-     * @param userRegistrationDto DTO med användarens registreringsinformation
-     * @return Den registrerade användaren
-     */
     public User register(UserRegistrationDto userRegistrationDto) {
         // Kontrollera om e-post redan finns
         if (userRepository.existsByEmail(userRegistrationDto.getEmail())) {
@@ -87,7 +81,7 @@ public class UserService {
         user.setEmail(userRegistrationDto.getEmail());
         user.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword())); // Kryptera lösenordet
 
-        return userRepository.save(user); // Spara användaren i databasen
+        return userRepository.save(user);
     }
 
     public Set<Book> getFavoriteBooks(int id) {

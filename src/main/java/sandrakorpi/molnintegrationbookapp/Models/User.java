@@ -21,9 +21,6 @@ public class User implements UserDetails {
     private String email;
     private String password; // Bör lagra haschat lösenord i databasen
 
-    /**
-     * Listan över böcker som användaren har som favoriter.
-     */
     @ManyToMany
     @JoinTable(
             name = "user_favorite_books",  // Namn på join-tabellen
@@ -36,15 +33,6 @@ public class User implements UserDetails {
     // Standardkonstruktör
     public User() {}
 
-    /**
-     * Konstruktor för att skapa en ny användare.
-     *
-     * @param userName Användarnamn
-     * @param email E-postadress
-     * @param password Lösenord
-     * @param favoriteBooks Lista över böcker som användaren tycker om
-     * @param booksToRead Lista över böcker som användaren vill läsa.
-     */
     public User(String userName, String email, String password, Set<Book> favoriteBooks, Set<Book> booksToRead) {
         this.userName = userName;
         this.email = email;

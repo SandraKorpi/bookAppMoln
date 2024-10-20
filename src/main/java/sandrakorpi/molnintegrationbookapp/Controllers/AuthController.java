@@ -32,8 +32,6 @@ public class AuthController {
         this.jwtService = jwtService;
 
     }
-
-    // @PostMapping-annoteringen definierar en metod som hanterar POST-begäran till "/login".
     @PostMapping("/login")
     @Operation(summary = "log in", description = "Log in a user")
     public ResponseEntity<JwtResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {

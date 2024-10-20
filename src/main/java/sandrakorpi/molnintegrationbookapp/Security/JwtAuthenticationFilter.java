@@ -26,79 +26,63 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    // Privat fält för att hålla en instans av HandlerExceptionResolver.
     private final HandlerExceptionResolver handlerExceptionResolver;
-    // Privat fält för att hålla en instans av JwtService.
+
     private final JwtService jwtService;
-    // Privat fält för att hålla en instans av UserDetailsService.
+
     private final UserDetailsService userDetailsService;
 
-    // Konstruktor för att injicera beroendena JwtService, UserDetailsService och HandlerExceptionResolver.
     @Autowired
     public JwtAuthenticationFilter(
             JwtService jwtService,
             UserDetailsService userDetailsService,
             HandlerExceptionResolver handlerExceptionResolver
     ) {
-        // Tilldelar den injicerade JwtService till det privata fältet.
+
         this.jwtService = jwtService;
-        // Tilldelar den injicerade UserDetailsService till det privata fältet.
         this.userDetailsService = userDetailsService;
-        // Tilldelar den injicerade HandlerExceptionResolver till det privata fältet.
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
-    // Override för att implementera doFilterInternal-metoden.
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest request, // Användarens HTTP-begäran.
-            @NonNull HttpServletResponse response, // HTTP-svaret som ska skickas tillbaka.
-            @NonNull FilterChain filterChain // Kedjan av filter som begäran passerar igenom.
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        // Hämtar Authorization-headern från begäran.
         final String authHeader = request.getHeader("Authorization");
 
-        // Om Authorization-headern är null eller inte börjar med "Bearer " (standardprefix för JWT).
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            // Fortsätter med nästa filter i kedjan utan att göra något.
             filterChain.doFilter(request, response);
-            return; // Avslutar metoden här om det inte finns en giltig JWT-token.
+            return;
         }
 
         try {
-            // Extraherar JWT-token från Authorization-headern.
             final String jwt = authHeader.substring(7);
-            // Använder JwtService för att extrahera användarnamnet från JWT-token.
             final String userEmail = jwtService.extractUsername(jwt);
 
-            // Hämtar aktuell autentiseringsinformation från säkerhetskontexten.
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            // Om användarnamnet finns och det inte redan finns en autentisering.
             if (userEmail != null && authentication == null) {
                 // Laddar användardetaljer från UserDetailsService med hjälp av användarnamnet.
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
                 // Om JWT-token är giltig för de laddade användardetaljerna.
                 if (jwtService.isTokenValid(jwt, userDetails)) {
-                    // Skapar en UsernamePasswordAuthenticationToken för den autentiserade användaren.
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, // Användarens detaljer.
-                            null, // Inga autentiseringsuppgifter (lösenord) behövs här.
-                            userDetails.getAuthorities() // Användarens roller och rättigheter.
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
                     );
 
-                    // Sätter autentiseringsdetaljer från begäran.
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    // Sätter autentiseringen i säkerhetskontexten.
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
 
-            // Fortsätter med nästa filter i kedjan.
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
-            // Hanterar undantag genom att skicka dem till HandlerExceptionResolver.
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }

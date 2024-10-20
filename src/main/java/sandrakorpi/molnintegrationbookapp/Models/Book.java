@@ -31,7 +31,6 @@ public class Book {
         this.recommended = recommended; //Standardvärde
     }
 
-    // Standardkonstruktor
     public Book() {
     }
 

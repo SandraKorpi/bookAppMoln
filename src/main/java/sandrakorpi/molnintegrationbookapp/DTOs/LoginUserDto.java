@@ -1,8 +1,5 @@
 package sandrakorpi.molnintegrationbookapp.DTOs;
 
-/**
- * Dataöverföringsobjekt (DTO) för användarinloggning.
- */
 public class LoginUserDto {
     private String userName;
     private String password;
