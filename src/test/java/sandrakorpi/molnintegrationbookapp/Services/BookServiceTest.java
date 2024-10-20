@@ -10,6 +10,7 @@ import sandrakorpi.molnintegrationbookapp.Models.Book;
 import sandrakorpi.molnintegrationbookapp.Repositories.BookRepository;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,9 +105,37 @@ assertEquals(mockDto.getTitle(), bookResult.getTitle());
 
     @Test
     void getAllBooks() {
+        // Skapa en lista med mock-böcker
+        Book mockbook2 = new Book();
+        mockbook2.setGenre("skräck");
+       mockbook2.setTitle("book2");
+        mockbook2.setAuthor("Author2");
+        mockbook2.setYearPublished(2024);
+        mockbook2.setRecommended(false);
+        mockbook2.setBookId(2L);
+
+        when(bookRepository.findAll()).thenReturn(Arrays.asList(mockBook, mockbook2));
+
+        // Anropa metoden getalllbooks
+        List<Book> bookList = bookService.getAllBooks();
+
+        // Verifiera att listan inte är tom och innehåller förväntade böcker
+        assertNotNull(bookList);
+        assertEquals(2, bookList.size());
+        assertEquals(mockBook.getTitle(), bookList.get(0).getTitle());
+        assertEquals(mockbook2.getTitle(), bookList.get(1).getTitle());
     }
 
     @Test
     void getBookOrFail() {
+            // Mocka att boken hittas
+            when(bookRepository.findById(mockBook.getBookId())).thenReturn(Optional.of(mockBook));
+
+            Book bookResult = bookService.getBookOrFail(mockBook.getBookId());
+
+            // Verifiera
+            assertNotNull(bookResult);
+            assertEquals(mockBook.getTitle(), bookResult.getTitle());
+
     }
 }
