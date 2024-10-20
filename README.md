@@ -20,3 +20,4 @@ Nästa steg var att skapa codebuild. En fil med build-specifikationer för att b
 
 Slutligen har jag skapat en pipeline och kopplat EC2 med GitHub, miljön och allt som behövs för att pipelinen ska köras varje gång projektet får en push till GitHub-repot. 
 Då byggs projektet och testerna i projektet körs.
+![databas](awsBilder/bookapppipeline.png)
