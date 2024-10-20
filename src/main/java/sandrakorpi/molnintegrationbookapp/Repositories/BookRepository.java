@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import sandrakorpi.molnintegrationbookapp.Models.Book;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book,Integer> {
+public interface BookRepository extends JpaRepository<Book, Long> {
 
 }
 

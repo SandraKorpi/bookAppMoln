@@ -2,9 +2,6 @@ package sandrakorpi.molnintegrationbookapp.Models;
 
 import jakarta.persistence.*;
 
-/**
- * Representerar en bok i systemet.
- */
 @Entity
 @Table(name = "books")
 public class Book {
@@ -17,17 +14,9 @@ public class Book {
     private int yearPublished;
     private String genre;
     @Column(name = "recommended")
-    private boolean recommended = false;
+    private boolean recommended;
 
-    /**
-     * Konstruktor för att skapa en ny bok.
-     *
-     * @param title Titel på boken
-     * @param author Författare till boken
-     * @param yearPublished År boken publicerades
-     * @param genre Genre av boken
-     * @param recommended Om boken är rekommenderad eller inte
-     */
+
     public Book(
             final String title,
             final String author,
@@ -88,5 +77,8 @@ public class Book {
 
     public void setRecommended(final boolean recommended) {
         this.recommended = recommended;
+    }
+
+    public void setBookId(long bookId) { this.bookId = bookId;
     }
 }
